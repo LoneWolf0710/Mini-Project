@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>AI Fleet Dashboard</title>
+
+<link rel="stylesheet" href="/static/style.css">
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+</head>
+
+<body>
+
+<h1 class="title">🚚 AI Fleet Management Dashboard</h1>
+
+<div class="fleet-container">
+
+<div class="vehicle-card">
+
+<h2>Vehicle 1</h2>
+
+<p>Status: <span id="status1">Unknown</span></p>
+
+<button onclick="simulateVehicle(1)">Run AI Check</button>
+
+</div>
+
+
+<div class="vehicle-card">
+
+<h2>Vehicle 2</h2>
+
+<p>Status: <span id="status2">Unknown</span></p>
+
+<button onclick="simulateVehicle(2)">Run AI Check</button>
+
+</div>
+
+
+<div class="vehicle-card">
+
+<h2>Vehicle 3</h2>
+
+<p>Status: <span id="status3">Unknown</span></p>
+
+<button onclick="simulateVehicle(3)">Run AI Check</button>
+
+</div>
+
+</div>
+
+
+<div class="chart-container">
+
+<canvas id="tempChart"></canvas>
+
+</div>
+
+<script src="/static/dashboard.js"></script>
+
+</body>
+
+</html>
