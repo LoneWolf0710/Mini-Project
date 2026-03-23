@@ -1,0 +1,135 @@
+{% extends "fleet/base.html" %}
+{% load fleet_filters %}
+{% block content %}
+
+<div class="space-y-6">
+  <div class="page-header">
+    <h2 class="page-title">AI PREDICTIONS</h2>
+    <p class="page-sub">ML-powered predictive maintenance engine</p>
+  </div>
+
+  <!-- Manual Prediction Engine -->
+  <div class="card glow animate-in delay-1">
+    <div class="flex items-center gap-3" style="margin-bottom:1.25rem">
+      <div class="stat-icon icon-primary">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 1 1 7.072 0l-.548.547A3.374 3.374 0 0 0 14 18.469V19a2 2 0 1 1-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+      </div>
+      <div>
+        <h3 class="font-display text-sm" style="letter-spacing:.1em">MANUAL PREDICTION ENGINE</h3>
+        <p class="text-xxs text-muted">Enter vehicle parameters for instant AI analysis</p>
+      </div>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:1rem;margin-bottom:1.25rem">
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Engine Temp</label>
+          <input type="number" name="engine_temp" value="{{ request.POST.engine_temp|default:'85' }}" class="input">
+        </div>
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Vibration Level</label>
+          <input type="number" name="vibration_level" value="{{ request.POST.vibration_level|default:'5' }}" class="input">
+        </div>
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Battery Voltage</label>
+          <input type="number" name="battery_voltage" value="{{ request.POST.battery_voltage|default:'12' }}" class="input">
+        </div>
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Engine RPM</label>
+          <input type="number" name="engine_rpm" value="{{ request.POST.engine_rpm|default:'3000' }}" class="input">
+        </div>
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Fuel Level</label>
+          <input type="number" name="fuel_level" value="{{ request.POST.fuel_level|default:'50' }}" class="input">
+        </div>
+        <div>
+          <label class="text-xxs text-muted font-display" style="letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:4px">Mileage</label>
+          <input type="number" name="mileage" value="{{ request.POST.mileage|default:'80000' }}" class="input">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <button type="submit" class="btn btn-primary">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h1v1H9zm4 0h1v1h-1zm-4 4h1v1H9zm4 0h1v1h-1z"/><path d="M12 2v2m0 18v2M2 12h2m18 0h2"/></svg>
+          Run Prediction
+        </button>
+        {% if result %}
+        <div class="flex items-center gap-2" style="padding:.5rem 1rem;border-radius:.75rem;font-family:var(--font-display);font-size:.875rem;letter-spacing:.1em;{% if result == 'Vehicle Healthy' %}background:hsl(160 100% 45%/0.1);color:var(--primary);border:1px solid hsl(160 100% 45%/0.3){% else %}background:hsl(0 85% 55%/0.1);color:var(--destructive);border:1px solid hsl(0 85% 55%/0.3){% endif %}">
+          {% if result == 'Vehicle Healthy' %}
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          {% else %}
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          {% endif %}
+          {{ result }}
+        </div>
+        {% endif %}
+      </div>
+    </form>
+  </div>
+
+  <!-- Probability Bar Chart -->
+  <div class="card animate-in delay-2">
+    <p class="section-title">MAINTENANCE PROBABILITY BY VEHICLE</p>
+    <div class="chart-wrap" style="height:280px"><canvas id="probChart"></canvas></div>
+  </div>
+
+  <!-- Predictions List -->
+  <div class="animate-in delay-3">
+    <p class="section-title">ALL PREDICTIONS</p>
+    <div class="space-y-3">
+      {% for p in predictions %}
+      <div class="pred-item {{ p.priority }}">
+        <div class="flex-1">
+          <div class="flex items-center gap-2" style="margin-bottom:4px">
+            <h4 class="font-display text-sm" style="letter-spacing:.1em">{{ p.vehicle_name }}</h4>
+            <span class="vc-status-badge badge-{{ p.priority }}">{{ p.priority }}</span>
+          </div>
+          <p class="text-xxs text-muted">{{ p.factors|join:" • " }}</p>
+        </div>
+        <div style="text-align:right;margin-right:1rem">
+          <p class="font-display" style="font-size:1.125rem;font-weight:700">{{ p.probability }}%</p>
+          <p class="text-xxs text-muted font-mono">by {{ p.predicted_date }}</p>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill {{ p.priority }}" style="width:{{ p.probability }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const chartData = {{ chart_data|safe }};
+const ctx = document.getElementById('probChart').getContext('2d');
+new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: chartData.map(d => d.name),
+    datasets: [{
+      label: 'Maintenance Probability (%)',
+      data: chartData.map(d => d.probability),
+      backgroundColor: 'hsl(160,100%,45%,0.8)',
+      borderColor: 'hsl(160,100%,45%)',
+      borderWidth: 1,
+      borderRadius: 4,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { backgroundColor: 'hsl(220,18%,10%)', borderColor: 'hsl(220,15%,18%)', borderWidth: 1 }
+    },
+    scales: {
+      x: { ticks: { color: 'hsl(215,15%,55%)', font:{size:10}, maxRotation: 45 }, grid: { color: 'hsl(220,15%,18%)' } },
+      y: { ticks: { color: 'hsl(215,15%,55%)', font:{size:10} }, grid: { color: 'hsl(220,15%,18%)' } }
+    }
+  }
+});
+</script>
+{% endblock %}

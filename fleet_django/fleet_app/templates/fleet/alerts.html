@@ -1,0 +1,88 @@
+{% extends "fleet/base.html" %}
+{% load fleet_filters %}
+{% block content %}
+
+<div class="space-y-6">
+  <div class="page-header">
+    <h2 class="page-title">ALERT CENTER</h2>
+    <p class="page-sub">Real-time vehicle health notifications</p>
+  </div>
+
+  <!-- Summary Counts -->
+  <div class="grid-3 animate-in">
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <p class="font-display text-destructive" style="font-size:1.875rem;font-weight:700">{{ critical_count }}</p>
+      <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Critical</p>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <p class="font-display text-warning" style="font-size:1.875rem;font-weight:700">{{ warning_count }}</p>
+      <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Warnings</p>
+    </div>
+    <div class="card" style="text-align:center;padding:1.5rem">
+      <p class="font-display text-accent" style="font-size:1.875rem;font-weight:700">{{ info_count }}</p>
+      <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Info</p>
+    </div>
+  </div>
+
+  <!-- Alert List -->
+  <div class="space-y-3 animate-in delay-1" id="alert-list">
+    {% for alert in alerts %}
+    <div class="alert-item {{ alert.type }}" id="alert-{{ alert.id }}" style="animation:fadeUp .4s ease {{ forloop.counter0|multiply_by:30 }}ms both">
+      {% if alert.type == 'critical' %}
+      <svg width="20" height="20" fill="none" stroke="hsl(0,85%,55%)" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+      {% elif alert.type == 'warning' %}
+      <svg width="20" height="20" fill="none" stroke="hsl(38,95%,55%)" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+      {% else %}
+      <svg width="20" height="20" fill="none" stroke="hsl(200,100%,50%)" stroke-width="2" viewBox="0 0 24 24" style="flex-shrink:0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      {% endif %}
+
+      <div class="flex-1 min-w-0">
+        <p class="text-sm">{{ alert.message }}</p>
+        <p class="text-xxs text-muted font-mono" style="margin-top:4px">
+          {{ alert.vehicle_name }} • {{ alert.timestamp_display }}
+        </p>
+      </div>
+
+      <button onclick="resolveAlert('{{ alert.id }}')" class="btn btn-secondary btn-resolve">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-right:4px"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        Resolve
+      </button>
+    </div>
+    {% empty %}
+    <div class="card" style="text-align:center;padding:3rem">
+      <svg width="40" height="40" fill="none" stroke="hsl(215,15%,55%)" stroke-width="1.5" viewBox="0 0 24 24" style="margin:0 auto 1rem"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+      <p class="text-sm text-muted">All clear — no active alerts</p>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+function resolveAlert(alertId) {
+  const el = document.getElementById('alert-' + alertId);
+  if (!el) return;
+
+  fetch("{% url 'alerts' %}", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'X-CSRFToken': getCookie('csrftoken'),
+    },
+    body: 'alert_id=' + encodeURIComponent(alertId),
+  }).then(r => r.json()).then(() => {
+    el.style.transition = 'opacity .3s, transform .3s';
+    el.style.opacity = '0';
+    el.style.transform = 'translateX(20px)';
+    setTimeout(() => el.remove(), 300);
+  });
+}
+
+function getCookie(name) {
+  const v = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+  return v ? v[2] : null;
+}
+</script>
+{% endblock %}
