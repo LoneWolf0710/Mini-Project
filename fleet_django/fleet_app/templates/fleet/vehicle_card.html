@@ -1,0 +1,56 @@
+{% load fleet_filters %}
+{% with vehicle.status as s %}
+<div class="vehicle-card {{ s }}" style="animation-delay:{{ forloop.counter0|add:0 }}00ms">
+  <div class="vc-header">
+    <div class="flex items-center gap-3">
+      <div class="vc-icon {{ s }}">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      </div>
+      <div>
+        <div class="vc-name">{{ vehicle.name }}</div>
+        <div class="vc-id">{{ vehicle.id }}</div>
+      </div>
+    </div>
+    <div class="flex items-center gap-2">
+      {% if vehicle.iot_connected %}
+      <svg width="14" height="14" fill="none" stroke="hsl(160,100%,45%)" stroke-width="2" viewBox="0 0 24 24" style="animation:pulse 2s infinite"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      {% else %}
+      <svg width="14" height="14" fill="none" stroke="hsl(215,15%,55%)" stroke-width="2" viewBox="0 0 24 24"><line x1="1" y1="1" x2="23" y2="23"/><path d="M16.72 11.06A10.94 10.94 0 0 1 19 12.55"/><path d="M5 12.55a10.94 10.94 0 0 1 5.17-2.39"/><path d="M10.71 5.05A16 16 0 0 1 22.56 9"/><path d="M1.42 9a15.91 15.91 0 0 1 4.7-2.88"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      {% endif %}
+      <span class="vc-status-badge badge-{{ s }}">{{ s }}</span>
+    </div>
+  </div>
+
+  <div class="vc-metrics">
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z"/></svg>
+      {{ vehicle.engine_temp }}°C
+    </div>
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      Vib: {{ vehicle.vibration_level }}
+    </div>
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      {{ vehicle.battery_voltage }}V
+    </div>
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      {{ vehicle.engine_rpm }} RPM
+    </div>
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="M3 6h2a2 2 0 0 1 2 2v5a2 2 0 0 0 2 2h4a2 2 0 0 0 2-2v-3"/></svg>
+      {{ vehicle.fuel_level }}%
+    </div>
+    <div class="vc-metric">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      {{ vehicle.mileage|divide_1000 }}k mi
+    </div>
+  </div>
+
+  <div class="vc-footer">
+    <span>Driver: {{ vehicle.driver }}</span>
+    <span class="font-mono">{{ vehicle.speed }} km/h</span>
+  </div>
+</div>
+{% endwith %}
