@@ -1,0 +1,146 @@
+{% extends "fleet/base.html" %}
+{% load fleet_filters %}
+{% block content %}
+
+<div class="space-y-6">
+  <div class="page-header">
+    <h2 class="page-title">FLEET ANALYTICS</h2>
+    <p class="page-sub">Operational intelligence & performance reports</p>
+  </div>
+
+  <!-- Four Charts Grid -->
+  <div class="grid-2 animate-in delay-1" style="gap:1.5rem">
+
+    <!-- AVG RPM Line Chart -->
+    <div class="card">
+      <p class="section-title">AVG ENGINE RPM • 24H</p>
+      <div class="chart-wrap" style="height:240px"><canvas id="rpmChart"></canvas></div>
+    </div>
+
+    <!-- Fuel Area Chart -->
+    <div class="card">
+      <p class="section-title">FUEL LEVEL TREND • 24H</p>
+      <div class="chart-wrap" style="height:240px"><canvas id="fuelChart"></canvas></div>
+    </div>
+
+    <!-- Active Vehicles Bar Chart -->
+    <div class="card">
+      <p class="section-title">ACTIVE VEHICLES • 24H</p>
+      <div class="chart-wrap" style="height:240px"><canvas id="activeChart"></canvas></div>
+    </div>
+
+    <!-- Fuel & Temp Per Vehicle -->
+    <div class="card">
+      <p class="section-title">FUEL & TEMP BY VEHICLE</p>
+      <div class="chart-wrap" style="height:240px"><canvas id="vehicleChart"></canvas></div>
+    </div>
+
+  </div>
+
+  <!-- Performance Summary -->
+  <div class="card glow animate-in delay-2">
+    <p class="section-title">FLEET PERFORMANCE SUMMARY</p>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.5rem;text-align:center">
+      <div>
+        <p class="font-display text-primary" style="font-size:1.5rem;font-weight:700">{{ total_mileage_m }}M mi</p>
+        <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Total Mileage</p>
+      </div>
+      <div>
+        <p class="font-display text-primary" style="font-size:1.5rem;font-weight:700">{{ fleet_uptime }}%</p>
+        <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Fleet Uptime</p>
+      </div>
+      <div>
+        <p class="font-display text-primary" style="font-size:1.5rem;font-weight:700">{{ iot_coverage }}%</p>
+        <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">IoT Coverage</p>
+      </div>
+      <div>
+        <p class="font-display text-primary" style="font-size:1.5rem;font-weight:700">{{ stats.avg_fuel }}%</p>
+        <p class="text-xxs text-muted" style="text-transform:uppercase;letter-spacing:.1em;margin-top:4px">Avg Fuel Economy</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+const tsData = {{ ts_data|safe }};
+const fuelByVehicle = {{ fuel_by_vehicle|safe }};
+
+const gridColor = 'hsl(220,15%,18%)';
+const tickColor = 'hsl(215,15%,55%)';
+const tooltipStyle = { backgroundColor: 'hsl(220,18%,10%)', borderColor: 'hsl(220,15%,18%)', borderWidth: 1 };
+
+const commonScales = {
+  x: { ticks: { color: tickColor, font:{size:10} }, grid: { color: gridColor } },
+  y: { ticks: { color: tickColor, font:{size:10} }, grid: { color: gridColor } }
+};
+
+// RPM Line Chart
+new Chart(document.getElementById('rpmChart'), {
+  type: 'line',
+  data: {
+    labels: tsData.map(d=>d.time),
+    datasets: [{ label: 'Avg RPM', data: tsData.map(d=>d.avg_rpm),
+      borderColor: 'hsl(200,100%,50%)', borderWidth: 2, pointRadius: 0, tension: 0.4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip: tooltipStyle },
+    scales: commonScales }
+});
+
+// Fuel Area Chart
+const fuelCtx = document.getElementById('fuelChart').getContext('2d');
+const fuelGrad = fuelCtx.createLinearGradient(0,0,0,240);
+fuelGrad.addColorStop(0,'hsl(38,95%,55%,0.3)');
+fuelGrad.addColorStop(1,'hsl(38,95%,55%,0)');
+new Chart(fuelCtx, {
+  type: 'line',
+  data: {
+    labels: tsData.map(d=>d.time),
+    datasets: [{ label: 'Avg Fuel %', data: tsData.map(d=>d.avg_fuel),
+      borderColor: 'hsl(38,95%,55%)', backgroundColor: fuelGrad,
+      fill: true, borderWidth: 2, pointRadius: 0, tension: 0.4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip: tooltipStyle },
+    scales: commonScales }
+});
+
+// Active Vehicles Bar Chart
+new Chart(document.getElementById('activeChart'), {
+  type: 'bar',
+  data: {
+    labels: tsData.map(d=>d.time),
+    datasets: [{ label: 'Active Vehicles', data: tsData.map(d=>d.active_vehicles),
+      backgroundColor: 'hsl(160,100%,45%,0.8)', borderRadius: 4 }]
+  },
+  options: { responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip: tooltipStyle },
+    scales: commonScales }
+});
+
+// Vehicle Fuel & Temp Grouped Bar
+new Chart(document.getElementById('vehicleChart'), {
+  type: 'bar',
+  data: {
+    labels: fuelByVehicle.map(d=>d.name),
+    datasets: [
+      { label: 'Fuel %', data: fuelByVehicle.map(d=>d.fuel),
+        backgroundColor: 'hsl(200,100%,50%,0.8)', borderRadius: 2 },
+      { label: 'Temp °C', data: fuelByVehicle.map(d=>d.temp),
+        backgroundColor: 'hsl(38,95%,55%,0.8)', borderRadius: 2 },
+    ]
+  },
+  options: { responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{ labels:{ color: tickColor, font:{size:10} } }, tooltip: tooltipStyle },
+    scales: {
+      x: { ticks: { color: tickColor, font:{size:9}, maxRotation: 45 }, grid: { color: gridColor } },
+      y: { ticks: { color: tickColor, font:{size:10} }, grid: { color: gridColor } }
+    }
+  }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,429 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FleetAI — Intelligence Platform</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: hsl(220,20%,6%);
+      --fg: hsl(210,20%,92%);
+      --card: hsl(220,18%,10%);
+      --card-fg: hsl(210,20%,92%);
+      --primary: hsl(160,100%,45%);
+      --primary-fg: hsl(220,20%,6%);
+      --secondary: hsl(220,15%,16%);
+      --secondary-fg: hsl(210,20%,85%);
+      --muted: hsl(220,15%,14%);
+      --muted-fg: hsl(215,15%,55%);
+      --accent: hsl(200,100%,50%);
+      --destructive: hsl(0,85%,55%);
+      --warning: hsl(38,95%,55%);
+      --border: hsl(220,15%,18%);
+      --radius: 0.75rem;
+      --glow-primary: 0 0 20px hsl(160 100% 45%/0.3),0 0 60px hsl(160 100% 45%/0.1);
+      --glow-accent: 0 0 20px hsl(200 100% 50%/0.3),0 0 60px hsl(200 100% 50%/0.1);
+      --glow-warning: 0 0 20px hsl(38 95% 55%/0.3);
+      --glow-destructive: 0 0 20px hsl(0 85% 55%/0.3);
+      --font-display: 'Orbitron', monospace;
+      --font-body: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--fg);
+      font-family: var(--font-body);
+      min-height: 100vh;
+    }
+
+    /* Scanline effect */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: repeating-linear-gradient(0deg, transparent, transparent 2px, hsl(220 20% 4%/0.03) 2px, hsl(220 20% 4%/0.03) 4px);
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* --- SIDEBAR --- */
+    .sidebar {
+      position: fixed;
+      left: 0; top: 0;
+      width: 256px;
+      height: 100vh;
+      background: var(--card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      animation: slideIn .4s ease;
+    }
+
+    @keyframes slideIn { from { transform: translateX(-80px); opacity:0; } to { transform: translateX(0); opacity:1; } }
+
+    .sidebar-logo {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+    }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .logo-title {
+      font-family: var(--font-display);
+      font-size: .875rem;
+      font-weight: 700;
+      color: var(--primary);
+      text-shadow: var(--glow-primary);
+      letter-spacing: .1em;
+    }
+
+    .logo-sub {
+      font-size: .625rem;
+      color: var(--muted-fg);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-top: 2px;
+    }
+
+    .sidebar-nav { flex: 1; padding: 1rem; display: flex; flex-direction: column; gap: 2px; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: .75rem;
+      padding: .75rem 1rem;
+      border-radius: var(--radius);
+      border: 1px solid transparent;
+      font-size: .875rem;
+      color: var(--muted-fg);
+      text-decoration: none;
+      transition: all .2s;
+      cursor: pointer;
+      background: transparent;
+      width: 100%;
+      text-align: left;
+    }
+
+    .nav-item:hover { color: var(--fg); background: var(--secondary); }
+
+    .nav-item.active {
+      background: hsl(160 100% 45%/0.1);
+      color: var(--primary);
+      border-color: hsl(160 100% 45%/0.2);
+      box-shadow: var(--glow-primary);
+    }
+
+    .nav-item.active .nav-label {
+      font-family: var(--font-display);
+      font-size: .75rem;
+      letter-spacing: .1em;
+    }
+
+    .nav-dot {
+      margin-left: auto;
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:.3; } }
+
+    .sidebar-status {
+      padding: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .status-row {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .75rem; color: var(--muted-fg);
+    }
+
+    .status-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--primary);
+      animation: pulse 2s infinite;
+    }
+
+    .status-version {
+      font-size: .625rem;
+      color: var(--muted-fg);
+      font-family: var(--font-mono);
+      margin-top: 4px;
+    }
+
+    /* --- MAIN --- */
+    .main { margin-left: 256px; padding: 2rem; }
+
+    /* --- CARDS --- */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+    }
+
+    .card.glow { box-shadow: var(--glow-primary); border-color: hsl(160 100% 45%/0.2); }
+    .card.glow-accent { box-shadow: var(--glow-accent); border-color: hsl(200 100% 50%/0.2); }
+
+    /* --- STAT CARD --- */
+    .stat-card { padding: 1.25rem; }
+    .stat-label { font-size: .75rem; color: var(--muted-fg); text-transform: uppercase; letter-spacing: .1em; }
+    .stat-value { font-family: var(--font-display); font-size: 1.875rem; font-weight: 700; margin-top: .5rem; }
+    .stat-sub { font-size: .75rem; color: var(--muted-fg); margin-top: 4px; }
+    .stat-trend { font-size: .75rem; margin-top: .5rem; font-family: var(--font-mono); }
+    .stat-icon { padding: .75rem; border-radius: var(--radius); }
+
+    .stat-primary { border-color: hsl(160 100% 45%/0.3); box-shadow: var(--glow-primary); }
+    .stat-warning { border-color: hsl(38 95% 55%/0.3); box-shadow: var(--glow-warning); }
+    .stat-destructive { border-color: hsl(0 85% 55%/0.3); box-shadow: var(--glow-destructive); }
+
+    .icon-primary { background: hsl(160 100% 45%/0.1); color: var(--primary); }
+    .icon-warning { background: hsl(38 95% 55%/0.1); color: var(--warning); }
+    .icon-destructive { background: hsl(0 85% 55%/0.1); color: var(--destructive); }
+    .icon-default { background: var(--secondary); color: var(--fg); }
+
+    /* --- GRID HELPERS --- */
+    .grid-2 { display: grid; grid-template-columns: repeat(2,1fr); gap: 1rem; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3,1fr); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4,1fr); gap: 1rem; }
+    .grid-4-resp { display: grid; grid-template-columns: repeat(auto-fill,minmax(200px,1fr)); gap: 1rem; }
+    .grid-vehicles { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 1rem; }
+    .gap-6 { gap: 1.5rem; }
+    .space-y-6 > * + * { margin-top: 1.5rem; }
+    .space-y-3 > * + * { margin-top: .75rem; }
+    .space-y-2 > * + * { margin-top: .5rem; }
+
+    /* --- TYPOGRAPHY --- */
+    .font-display { font-family: var(--font-display); }
+    .font-mono { font-family: var(--font-mono); }
+    .text-glow { text-shadow: var(--glow-primary); }
+    .text-primary { color: var(--primary); }
+    .text-warning { color: var(--warning); }
+    .text-destructive { color: var(--destructive); }
+    .text-accent { color: var(--accent); }
+    .text-muted { color: var(--muted-fg); }
+    .text-xs { font-size: .75rem; }
+    .text-sm { font-size: .875rem; }
+    .text-xxs { font-size: .625rem; }
+
+    /* --- PAGE HEADER --- */
+    .page-header { animation: fadeUp .4s ease; }
+    .page-title { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; letter-spacing: .15em; text-shadow: var(--glow-primary); }
+    .page-sub { font-size: .875rem; color: var(--muted-fg); margin-top: 4px; }
+    @keyframes fadeUp { from { opacity:0; transform:translateY(-10px); } to { opacity:1; transform:translateY(0); } }
+
+    /* --- SECTION HEADER --- */
+    .section-title { font-family: var(--font-display); font-size: .75rem; letter-spacing: .15em; color: var(--muted-fg); text-transform: uppercase; margin-bottom: 1rem; }
+
+    /* --- VEHICLE CARD --- */
+    .vehicle-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: transform .2s, box-shadow .2s;
+      animation: fadeUp .4s ease both;
+    }
+    .vehicle-card:hover { transform: translateY(-2px) scale(1.01); box-shadow: 0 8px 32px hsl(0 0% 0%/0.3); }
+    .vehicle-card.healthy { border: 1px solid hsl(160 100% 45%/0.3); color: var(--primary); }
+    .vehicle-card.warning { border: 1px solid hsl(38 95% 55%/0.3); color: var(--warning); }
+    .vehicle-card.critical { border: 1px solid hsl(0 85% 55%/0.3); color: var(--destructive); }
+    .vehicle-card.maintenance { border: 1px solid var(--border); color: var(--muted-fg); }
+
+    .vc-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem; }
+    .vc-icon { padding: .5rem; border-radius: 8px; display: flex; align-items:center; justify-content:center; }
+    .vc-icon.healthy { background: hsl(160 100% 45%/0.1); }
+    .vc-icon.warning { background: hsl(38 95% 55%/0.1); }
+    .vc-icon.critical { background: hsl(0 85% 55%/0.1); }
+    .vc-icon.maintenance { background: var(--muted); }
+    .vc-name { font-family: var(--font-display); font-size: .875rem; font-weight: 700; letter-spacing: .1em; }
+    .vc-id { font-family: var(--font-mono); font-size: .625rem; color: var(--muted-fg); }
+    .vc-status-badge { font-family: var(--font-display); font-size: .625rem; letter-spacing: .15em; padding: 2px 8px; border-radius: 4px; text-transform: uppercase; }
+    .badge-healthy { background: hsl(160 100% 45%/0.1); color: var(--primary); }
+    .badge-warning { background: hsl(38 95% 55%/0.1); color: var(--warning); }
+    .badge-critical { background: hsl(0 85% 55%/0.1); color: var(--destructive); }
+    .badge-maintenance { background: var(--muted); color: var(--muted-fg); }
+    .badge-high { background: hsl(0 85% 55%/0.2); color: var(--destructive); }
+    .badge-medium { background: hsl(38 95% 55%/0.2); color: var(--warning); }
+    .badge-low { background: hsl(160 100% 45%/0.2); color: var(--primary); }
+    .vc-metrics { display: grid; grid-template-columns: repeat(3,1fr); gap: .75rem; font-size: .75rem; color: var(--fg); }
+    .vc-metric { display: flex; align-items: center; gap: .375rem; font-family: var(--font-mono); }
+    .vc-metric svg { width:12px; height:12px; color: var(--muted-fg); }
+    .vc-footer { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid var(--border); display:flex; justify-content:space-between; font-size: .625rem; color: var(--muted-fg); }
+
+    /* --- ALERT ITEM --- */
+    .alert-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: var(--radius); }
+    .alert-item.critical { border: 1px solid hsl(0 85% 55%/0.3); background: hsl(0 85% 55%/0.05); }
+    .alert-item.warning { border: 1px solid hsl(38 95% 55%/0.3); background: hsl(38 95% 55%/0.05); }
+    .alert-item.info { border: 1px solid hsl(200 100% 50%/0.3); background: hsl(200 100% 50%/0.05); }
+
+    /* --- PREDICTION ITEM --- */
+    .pred-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-radius: var(--radius); }
+    .pred-item.high { border: 1px solid hsl(0 85% 55%/0.4); background: hsl(0 85% 55%/0.05); }
+    .pred-item.medium { border: 1px solid hsl(38 95% 55%/0.4); background: hsl(38 95% 55%/0.05); }
+    .pred-item.low { border: 1px solid hsl(160 100% 45%/0.2); background: hsl(160 100% 45%/0.05); }
+
+    /* --- PROGRESS BAR --- */
+    .progress-bar { height: 8px; background: var(--secondary); border-radius: 4px; overflow: hidden; width: 96px; }
+    .progress-fill { height: 100%; border-radius: 4px; transition: width .8s ease; }
+    .progress-fill.high { background: var(--destructive); }
+    .progress-fill.medium { background: var(--warning); }
+    .progress-fill.low { background: var(--primary); }
+
+    /* --- BUTTONS --- */
+    .btn { display: inline-flex; align-items: center; gap: .375rem; padding: .5rem 1rem; border-radius: var(--radius); font-family: var(--font-display); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); transition: all .2s; text-decoration: none; }
+    .btn:active { transform: scale(.98); }
+    .btn-primary { background: linear-gradient(135deg,var(--primary),var(--accent)); color: var(--primary-fg); border-color: transparent; }
+    .btn-primary:hover { opacity: .9; }
+    .btn-secondary { background: var(--secondary); color: var(--muted-fg); }
+    .btn-secondary:hover { color: var(--fg); border-color: hsl(160 100% 45%/0.3); background: hsl(160 100% 45%/0.1); }
+    .btn-resolve { padding: .375rem .75rem; }
+
+    /* --- INPUT --- */
+    .input { width: 100%; background: var(--secondary); border: 1px solid var(--border); border-radius: var(--radius); padding: .5rem .75rem; font-size: .875rem; color: var(--fg); font-family: var(--font-mono); outline: none; }
+    .input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px hsl(160 100% 45%/0.2); }
+    .input-search { padding-left: 2.5rem; }
+
+    /* --- FILTER TABS --- */
+    .filter-tab { padding: .5rem 1rem; border-radius: var(--radius); font-family: var(--font-display); font-size: .75rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; border: 1px solid var(--border); background: var(--secondary); color: var(--muted-fg); transition: all .2s; text-decoration: none; }
+    .filter-tab:hover { color: var(--fg); }
+    .filter-tab.active { background: hsl(160 100% 45%/0.1); color: var(--primary); border-color: hsl(160 100% 45%/0.3); }
+
+    /* --- IOT CODE BLOCK --- */
+    .code-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 1rem; overflow-x: auto; }
+    .code-block pre { font-family: var(--font-mono); font-size: .6875rem; color: hsl(160 100% 45%/0.8); line-height: 1.6; }
+
+    /* --- SETTINGS ITEM --- */
+    .settings-item { display: flex; align-items: center; justify-content: space-between; padding: .75rem; border-radius: var(--radius); background: var(--secondary); border: 1px solid var(--border); }
+
+    /* --- SCROLLBAR --- */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--muted); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--muted-fg); }
+
+    /* --- FLEX HELPERS --- */
+    .flex { display: flex; }
+    .flex-col { flex-direction: column; }
+    .items-center { align-items: center; }
+    .items-start { align-items: flex-start; }
+    .justify-between { justify-content: space-between; }
+    .justify-center { justify-content: center; }
+    .flex-1 { flex: 1; }
+    .gap-2 { gap: .5rem; }
+    .gap-3 { gap: .75rem; }
+    .gap-4 { gap: 1rem; }
+    .flex-wrap { flex-wrap: wrap; }
+    .min-w-0 { min-width: 0; }
+    .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .shrink-0 { flex-shrink: 0; }
+
+    /* --- CHART CONTAINER --- */
+    .chart-wrap { position: relative; }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 1024px) {
+      .grid-4 { grid-template-columns: repeat(2,1fr); }
+    }
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-256px); }
+      .main { margin-left: 0; padding: 1rem; }
+      .grid-4, .grid-3, .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* --- ANIMATE ITEMS --- */
+    .animate-in { animation: fadeUp .4s ease both; }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
+    .delay-4 { animation-delay: .4s; }
+    .delay-5 { animation-delay: .5s; }
+  </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon">🛡️</div>
+    <div>
+      <div class="logo-title">FLEETAI</div>
+      <div class="logo-sub">Intelligence Platform</div>
+    </div>
+  </div>
+
+  <nav class="sidebar-nav">
+    {% with request.resolver_match.url_name as current %}
+    <a href="{% url 'dashboard' %}" class="nav-item {% if current == 'dashboard' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span class="nav-label">Dashboard</span>
+      {% if current == 'dashboard' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'vehicles' %}" class="nav-item {% if current == 'vehicles' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v9a2 2 0 0 1-2 2h-2"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/></svg>
+      <span class="nav-label">Vehicles</span>
+      {% if current == 'vehicles' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'predictions' %}" class="nav-item {% if current == 'predictions' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M9 9h1v1H9zm4 0h1v1h-1zm-4 4h1v1H9zm4 0h1v1h-1z"/><path d="M12 2v2m0 18v2M2 12h2m18 0h2"/></svg>
+      <span class="nav-label">Predictions</span>
+      {% if current == 'predictions' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'alerts' %}" class="nav-item {% if current == 'alerts' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+      <span class="nav-label">Alerts</span>
+      {% if current == 'alerts' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'analytics' %}" class="nav-item {% if current == 'analytics' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      <span class="nav-label">Analytics</span>
+      {% if current == 'analytics' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'iot' %}" class="nav-item {% if current == 'iot' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
+      <span class="nav-label">IoT Devices</span>
+      {% if current == 'iot' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    <a href="{% url 'settings' %}" class="nav-item {% if current == 'settings' %}active{% endif %}">
+      <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      <span class="nav-label">Settings</span>
+      {% if current == 'settings' %}<span class="nav-dot"></span>{% endif %}
+    </a>
+    {% endwith %}
+  </nav>
+
+  <div class="sidebar-status">
+    <div class="status-row">
+      <div class="status-dot"></div>
+      <span>System Online</span>
+    </div>
+    <div class="status-version">v2.4.1 • Arduino R4 WiFi Ready</div>
+  </div>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+  {% block content %}{% endblock %}
+</main>
+
+{% block scripts %}{% endblock %}
+</body>
+</html>
