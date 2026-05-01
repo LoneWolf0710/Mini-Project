@@ -1,0 +1,217 @@
+/* fleet-agent/dashboard/static/style.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background: #f5f5f5;
+    display: flex;
+    height: 100vh;
+    overflow: hidden;
+}
+
+#control-panel {
+    width: 30%;
+    min-width: 320px;
+    height: 100vh;
+    overflow-y: auto;
+    background: #ffffff;
+    border-right: 1px solid #e0e0e0;
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+#map-container {
+    flex: 1;
+    height: 100vh;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+    border: 1px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+
+.card-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 12px;
+    margin-top: 0;
+}
+
+.status-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 6px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.status-row:last-child {
+    border-bottom: none;
+}
+
+.status-label {
+    font-size: 14px;
+    color: #333;
+}
+
+.badge {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 12px;
+}
+
+.badge-green {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
+
+.badge-red {
+    background: #ffebee;
+    color: #c62828;
+}
+
+.badge-gray {
+    background: #f5f5f5;
+    color: #666;
+}
+
+.btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s;
+}
+
+.btn-primary {
+    background: #1a73e8;
+    color: white;
+}
+
+.btn-primary:hover {
+    background: #1557b0;
+}
+
+.btn-secondary {
+    background: #f5f5f5;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+.btn-secondary:hover {
+    background: #e8e8e8;
+}
+
+.btn-danger {
+    background: #e53935;
+    color: white;
+}
+
+.btn-danger:hover {
+    background: #b71c1c;
+}
+
+.btn-success {
+    background: #43a047;
+    color: white;
+}
+
+.btn-success:hover {
+    background: #2e7d32;
+}
+
+.btn-group {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+}
+
+.kill-warning {
+    font-size: 12px;
+    color: #e53935;
+    margin-bottom: 12px;
+}
+
+#breach-log {
+    max-height: 200px;
+    overflow-y: auto;
+    font-size: 12px;
+    font-family: monospace;
+}
+
+.breach-entry {
+    padding: 4px 0;
+    border-bottom: 1px solid #f0f0f0;
+    color: #c62828;
+}
+
+.data-value {
+    font-size: 22px;
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.data-label {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 8px;
+}
+
+.data-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.status-line {
+    font-size: 12px;
+    color: #666;
+    margin-top: 8px;
+    min-height: 18px;
+}
+
+.dashboard-header {
+    margin-bottom: 20px;
+}
+
+.dashboard-header h1 {
+    font-size: 20px;
+    margin: 0 0 4px 0;
+    color: #1a1a1a;
+}
+
+.dashboard-header p {
+    font-size: 13px;
+    color: #888;
+    margin: 0;
+}
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ccc;
+    border-radius: 2px;
+}

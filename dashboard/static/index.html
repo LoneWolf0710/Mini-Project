@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fleet Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div id="control-panel">
+        <div class="dashboard-header">
+            <h1>Fleet Dashboard</h1>
+            <p id="vehicle-id-subtitle">Loading vehicle ID...</p>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">STATUS CARD</h2>
+            <div class="status-row">
+                <span class="status-label">GPS Fix</span>
+                <span id="gps-status" class="badge badge-gray">UNKNOWN</span>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Geofence</span>
+                <span id="geofence-status" class="badge badge-gray">UNKNOWN</span>
+            </div>
+            <div class="status-row">
+                <span class="status-label">Kill switch</span>
+                <span id="kill-status" class="badge badge-gray">UNKNOWN</span>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">VEHICLE DATA CARD</h2>
+            <div class="data-grid">
+                <div>
+                    <div class="data-label">Speed</div>
+                    <div id="data-speed" class="data-value">0.0 km/h</div>
+                </div>
+                <div>
+                    <div class="data-label">Satellites</div>
+                    <div id="data-satellites" class="data-value">0</div>
+                </div>
+            </div>
+            <div class="status-line" style="margin-top: 12px;">Last update: <span id="data-timestamp">--:--:--</span></div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Geofence boundary</h2>
+            <div class="btn-group">
+                <button id="btn-draw" class="btn btn-primary">Draw new boundary</button>
+                <button id="btn-edit" class="btn btn-secondary">Edit boundary</button>
+            </div>
+            <div class="btn-group">
+                <button id="btn-save" class="btn btn-success">Save boundary</button>
+                <button id="btn-clear" class="btn btn-danger">Clear boundary</button>
+            </div>
+            <div id="geofence-status-line" class="status-line">Vertex count: 0</div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Remote kill switch</h2>
+            <div class="kill-warning">Cuts vehicle ignition immediately.</div>
+            <div class="btn-group">
+                <button id="btn-kill" class="btn btn-danger">KILL VEHICLE</button>
+                <button id="btn-restore" class="btn btn-success">RESTORE POWER</button>
+            </div>
+            <div id="kill-status-line" class="status-line">Status: NORMAL</div>
+        </div>
+
+        <div class="card">
+            <h2 class="card-title">Breach log</h2>
+            <div id="breach-log"></div>
+        </div>
+    </div>
+
+    <div id="map-container">
+        <div id="map"></div>
+    </div>
+
+    <script src="/static/map.js"></script>
+</body>
+</html>
