@@ -1,0 +1,146 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CareDrive{% endblock %}</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        background: 'hsl(var(--background))',
+                        foreground: 'hsl(var(--foreground))',
+                        card: 'hsl(var(--card))',
+                        'card-foreground': 'hsl(var(--card-foreground))',
+                        primary: {
+                            DEFAULT: 'hsl(var(--primary))',
+                            foreground: 'hsl(var(--primary-foreground))',
+                        },
+                        secondary: {
+                            DEFAULT: 'hsl(var(--secondary))',
+                            foreground: 'hsl(var(--secondary-foreground))',
+                        },
+                        muted: 'hsl(var(--muted))',
+                        'muted-foreground': 'hsl(var(--muted-foreground))',
+                        accent: {
+                            DEFAULT: 'hsl(var(--accent))',
+                            foreground: 'hsl(var(--accent-foreground))',
+                        },
+                        destructive: {
+                            DEFAULT: 'hsl(var(--destructive))',
+                            foreground: 'hsl(var(--destructive-foreground))',
+                        },
+                        warning: {
+                            DEFAULT: 'hsl(var(--warning))',
+                            foreground: 'hsl(var(--warning-foreground))',
+                        },
+                        border: 'hsl(var(--border))',
+                        input: 'hsl(var(--input))',
+                        ring: 'hsl(var(--ring))',
+                    },
+                    fontFamily: {
+                        sans: ['Space Grotesk', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'ui-monospace', 'monospace'],
+                    },
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        :root {
+            --background: 222 47% 5%;
+            --foreground: 180 14% 92%;
+            --card: 222 40% 8%;
+            --card-foreground: 180 14% 92%;
+            --primary: 162 95% 50%;
+            --primary-foreground: 222 47% 7%;
+            --secondary: 222 30% 14%;
+            --secondary-foreground: 180 14% 92%;
+            --muted: 222 30% 12%;
+            --muted-foreground: 215 16% 60%;
+            --accent: 195 96% 56%;
+            --accent-foreground: 222 47% 7%;
+            --warning: 38 95% 58%;
+            --warning-foreground: 222 47% 7%;
+            --destructive: 0 84% 62%;
+            --destructive-foreground: 0 0% 100%;
+            --border: 222 30% 16%;
+            --input: 222 30% 14%;
+            --ring: 162 95% 50%;
+        }
+        
+        * { border-color: hsl(var(--border)); }
+        html { font-family: 'Space Grotesk', system-ui, sans-serif; }
+        body {
+            background: radial-gradient(ellipse at top, hsl(162 95% 50% / 0.18), transparent 60%),
+                        radial-gradient(ellipse at bottom right, hsl(195 96% 56% / 0.12), transparent 55%),
+                        linear-gradient(180deg, hsl(222 47% 5%), hsl(222 47% 4%));
+            background-attachment: fixed;
+            min-height: 100vh;
+            background-color: hsl(var(--background));
+            color: hsl(var(--foreground));
+        }
+        
+        .glass {
+            background: hsl(var(--card) / 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid hsl(var(--border));
+        }
+        
+        .gradient-text {
+            background: linear-gradient(135deg, hsl(162 95% 50%), hsl(195 96% 56%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .glow-primary {
+            box-shadow: 0 0 40px hsl(162 95% 50% / 0.25);
+        }
+        
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.5; transform: scale(1.2); }
+        }
+        
+        .grid-bg {
+            background-image: 
+                linear-gradient(hsl(162 95% 50% / 0.06) 1px, transparent 1px),
+                linear-gradient(90deg, hsl(162 95% 50% / 0.06) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+    </style>
+    
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="antialiased">
+    <div id="app">
+        {% block content %}{% endblock %}
+    </div>
+    
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,141 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import 'leaflet/dist/leaflet.css';
+
+/* FleetIQ design system — dark, technical, luminous */
+
+@layer base {
+  :root {
+    /* Light fallback (we run dark by default) */
+    --background: 220 30% 98%;
+    --foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    --primary: 168 76% 42%;
+    --primary-foreground: 222 47% 7%;
+    --secondary: 220 14% 94%;
+    --secondary-foreground: 222 47% 11%;
+    --muted: 220 14% 94%;
+    --muted-foreground: 220 9% 46%;
+    --accent: 168 76% 42%;
+    --accent-foreground: 222 47% 7%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 220 13% 88%;
+    --input: 220 13% 88%;
+    --ring: 168 76% 42%;
+    --radius: 0.85rem;
+  }
+
+  .dark, :root {
+    /* FleetIQ dark theme — deep navy + electric mint */
+    --background: 222 47% 5%;
+    --foreground: 180 14% 92%;
+
+    --card: 222 40% 8%;
+    --card-foreground: 180 14% 92%;
+
+    --popover: 222 47% 7%;
+    --popover-foreground: 180 14% 92%;
+
+    --primary: 162 95% 50%;
+    --primary-foreground: 222 47% 7%;
+    --primary-glow: 162 95% 65%;
+
+    --secondary: 222 30% 14%;
+    --secondary-foreground: 180 14% 92%;
+
+    --muted: 222 30% 12%;
+    --muted-foreground: 215 16% 60%;
+
+    --accent: 195 96% 56%;
+    --accent-foreground: 222 47% 7%;
+
+    --warning: 38 95% 58%;
+    --warning-foreground: 222 47% 7%;
+
+    --destructive: 0 84% 62%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 30% 16%;
+    --input: 222 30% 14%;
+    --ring: 162 95% 50%;
+
+    --sidebar-background: 222 47% 6%;
+    --sidebar-foreground: 180 14% 88%;
+    --sidebar-primary: 162 95% 50%;
+    --sidebar-primary-foreground: 222 47% 7%;
+    --sidebar-accent: 222 30% 12%;
+    --sidebar-accent-foreground: 180 14% 92%;
+    --sidebar-border: 222 30% 14%;
+    --sidebar-ring: 162 95% 50%;
+
+    /* Effects */
+    --gradient-hero: radial-gradient(ellipse at top, hsl(162 95% 50% / 0.18), transparent 60%),
+                     radial-gradient(ellipse at bottom right, hsl(195 96% 56% / 0.12), transparent 55%),
+                     linear-gradient(180deg, hsl(222 47% 5%), hsl(222 47% 4%));
+    --gradient-primary: linear-gradient(135deg, hsl(162 95% 50%), hsl(195 96% 56%));
+    --gradient-card: linear-gradient(160deg, hsl(222 40% 9% / 0.85), hsl(222 40% 7% / 0.75));
+    --shadow-glow: 0 0 40px hsl(162 95% 50% / 0.25);
+    --shadow-elegant: 0 20px 50px -20px hsl(222 47% 0% / 0.6);
+    --grid-line: hsl(162 95% 50% / 0.06);
+  }
+}
+
+@layer base {
+  * { @apply border-border; }
+  html { font-family: 'Space Grotesk', system-ui, sans-serif; }
+  body {
+    @apply bg-background text-foreground antialiased;
+    background-image: var(--gradient-hero);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+  .font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+}
+
+@layer components {
+  .glass {
+    background: var(--gradient-card);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid hsl(var(--border));
+    box-shadow: var(--shadow-elegant);
+  }
+  .glow-primary { box-shadow: var(--shadow-glow); }
+  .gradient-text {
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .grid-bg {
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 48px 48px;
+  }
+  .pulse-dot {
+    @apply relative inline-flex h-2 w-2 rounded-full;
+  }
+  .pulse-dot::after {
+    content: '';
+    @apply absolute inset-0 rounded-full animate-ping;
+    background: inherit;
+    opacity: 0.6;
+  }
+}
+
+@layer utilities {
+  .text-balance { text-wrap: balance; }
+  @keyframes float-slow {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+  }
+  .animate-float { animation: float-slow 6s ease-in-out infinite; }
+}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block title %}CareDrive - Fleet Management{% endblock %}
+
+{% block content %}
+<div class="p-6 md:p-10">
+    <header class="mb-8">
+        <span class="pulse-dot bg-primary"></span>
+        <h1 class="mt-4 text-4xl font-bold tracking-tight">CareDrive</h1>
+        <p class="mt-2 text-muted-foreground">Fleet Management System</p>
+    </header>
+
+    <div class="grid gap-4 md:grid-cols-3">
+        <a href="/dashboard/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Dashboard</div>
+            <p class="text-sm text-muted-foreground">Fleet overview & live map</p>
+        </a>
+        <a href="/vehicles/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Vehicles</div>
+            <p class="text-sm text-muted-foreground">Manage your fleet</p>
+        </a>
+        <a href="/alerts/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Alerts</div>
+            <p class="text-sm text-muted-foreground">Vehicle alerts & notifications</p>
+        </a>
+        <a href="/map/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Live Map</div>
+            <p class="text-sm text-muted-foreground">Real-time vehicle tracking</p>
+        </a>
+        <a href="/predictions/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Predictions</div>
+            <p class="text-sm text-muted-foreground">AI maintenance predictions</p>
+        </a>
+        <a href="/admin/simulator/" class="glass rounded-2xl p-6 hover:bg-secondary/50 transition">
+            <div class="text-xl font-semibold">Demo Simulator</div>
+            <p class="text-sm text-muted-foreground">Launch demo fleet</p>
+        </a>
+    </div>
+</div>
+{% endblock %}

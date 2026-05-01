@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Vehicles - CareDrive{% endblock %}
+
+{% block content %}
+<div class="p-6 md:p-10">
+    <header class="mb-8">
+        <h1 class="text-3xl font-bold tracking-tight md:text-4xl">Vehicles</h1>
+        <p class="mt-1 text-muted-foreground">Manage your fleet vehicles</p>
+    </header>
+
+    <div class="glass rounded-2xl overflow-hidden">
+        <table class="w-full">
+            <thead class="border-b border-border">
+                <tr class="text-left text-xs uppercase tracking-wider text-muted-foreground">
+                    <th class="p-4">Vehicle</th>
+                    <th class="p-4">Plate</th>
+                    <th class="p-4">Status</th>
+                    <th class="p-4">Type</th>
+                    <th class="p-4">Odometer</th>
+                    <th class="p-4">Health</th>
+                    <th class="p-4">Risk</th>
+                    <th class="p-4">Speed</th>
+                    <th class="p-4">Fuel</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for v in vehicles %}
+                <tr class="border-b border-border hover:bg-secondary/30 transition">
+                    <td class="p-4">
+                        <a href="/vehicles/{{ v.id }}/" class="font-semibold hover:text-primary">{{ v.name }}</a>
+                    </td>
+                    <td class="p-4 font-mono text-sm">{{ v.plate }}</td>
+                    <td class="p-4">
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-xs uppercase
+                            {% if v.status == 'active' %}bg-primary/20 text-primary
+                            {% elif v.status == 'idle' %}bg-warning/20 text-warning
+                            {% else %}bg-muted text-muted-foreground{% endif %}">
+                            {{ v.status }}
+                        </span>
+                    </td>
+                    <td class="p-4">{{ v.vehicle_type }}</td>
+                    <td class="p-4 font-mono">{{ v.odometer }} km</td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-16 h-2 bg-secondary rounded-full overflow-hidden">
+                                <div class="h-full 
+                                    {% if v.health_score >= 80 %}bg-primary
+                                    {% elif v.health_score >= 50 %}bg-warning
+                                    {% else %}bg-destructive{% endif %}" 
+                                    style="width: {{ v.health_score }}%"></div>
+                            </div>
+                            <span class="font-mono text-xs">{{ v.health_score }}</span>
+                        </div>
+                    </td>
+                    <td class="p-4">
+                        <span class="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 font-mono text-xs uppercase
+                            {% if v.risk == 'high' %}bg-destructive/20 text-destructive
+                            {% elif v.risk == 'medium' %}bg-warning/20 text-warning
+                            {% else %}bg-primary/20 text-primary{% endif %}">
+                            {{ v.risk }}
+                        </span>
+                    </td>
+                    <td class="p-4 font-mono">{{ v.speed|floatformat:0 }} km/h</td>
+                    <td class="p-4 font-mono">{{ v.fuel_level|floatformat:0 }}%</td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" class="p-8 text-center text-muted-foreground">
+                        No vehicles yet. <a href="/admin/simulator/" class="text-primary hover:underline">Launch demo</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
